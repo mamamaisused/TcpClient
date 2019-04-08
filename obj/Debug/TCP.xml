@@ -1,0 +1,57 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+TCP
+</name>
+</assembly>
+<members>
+<member name="P:TCP.My.Resources.Resources.ResourceManager">
+	<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member><member name="P:TCP.My.Resources.Resources.Culture">
+	<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member><member name="T:TCP.My.Resources.Resources">
+	<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member><member name="M:TCP.fmTcpClient.ToggleTimer(System.Boolean)">
+	<summary>
+ 切换主进程的计时器状态
+ </summary>
+	<param name="state">state 为 True 启动计时器</param>
+	<remarks></remarks>
+</member><member name="M:TCP.fmTcpClient.RefreshReceive(System.Byte)">
+	<summary>
+ 接收到数据后刷新显示
+ </summary>
+	<param name="_byte">_byte为接收到的数据</param>
+	<remarks></remarks>
+</member><member name="M:TCP.fmTcpClient.GetSendData(System.Byte[]@)">
+	<summary>
+ 从UI中的文本框中获取要发送的数据，并将String类型转换为Byte类型
+ </summary>
+	<param name="_bytes">转换后存入_bytes数组中</param>
+	<remarks></remarks>
+</member><member name="M:TCP.fmTcpClient.ReadBuffered">
+	<summary>
+ 从以太网接收缓存中读取数据
+ </summary>
+	<remarks></remarks>
+</member><member name="M:TCP.fmTcpClient.ReadThreadFunc">
+	<summary>
+ 读线程中启动的方法
+ </summary>
+	<remarks></remarks>
+</member><member name="M:TCP.fmTcpClient.WriteThreadFunc">
+	<summary>
+ 写线程中启动的方法
+ </summary>
+	<remarks></remarks>
+</member>
+</members>
+</doc>
