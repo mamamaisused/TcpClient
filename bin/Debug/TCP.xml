@@ -6,20 +6,7 @@ TCP
 </name>
 </assembly>
 <members>
-<member name="P:TCP.My.Resources.Resources.ResourceManager">
-	<summary>
-  Returns the cached ResourceManager instance used by this class.
-</summary>
-</member><member name="P:TCP.My.Resources.Resources.Culture">
-	<summary>
-  Overrides the current thread's CurrentUICulture property for all
-  resource lookups using this strongly typed resource class.
-</summary>
-</member><member name="T:TCP.My.Resources.Resources">
-	<summary>
-  A strongly-typed resource class, for looking up localized strings, etc.
-</summary>
-</member><member name="M:TCP.fmTcpClient.ToggleTimer(System.Boolean)">
+<member name="M:TCP.fmTcpClient.ToggleTimer(System.Boolean)">
 	<summary>
  切换主进程的计时器状态
  </summary>
@@ -37,7 +24,7 @@ TCP
  </summary>
 	<param name="_bytes">转换后存入_bytes数组中</param>
 	<remarks></remarks>
-</member><member name="M:TCP.fmTcpClient.ReadBuffered">
+</member><member name="M:TCP.fmTcpClient.tcpReadBuffered">
 	<summary>
  从以太网接收缓存中读取数据
  </summary>
@@ -52,6 +39,25 @@ TCP
  写线程中启动的方法
  </summary>
 	<remarks></remarks>
+</member><member name="M:TCP.fmTcpClient.SetSendText(System.Byte[])">
+	<summary>
+ 将需要发送的报文添加到发送对话框
+ </summary>
+	<param name="_data"></param>
+	<remarks></remarks>
+</member><member name="P:TCP.My.Resources.Resources.ResourceManager">
+	<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member><member name="P:TCP.My.Resources.Resources.Culture">
+	<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member><member name="T:TCP.My.Resources.Resources">
+	<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
 </member>
 </members>
 </doc>

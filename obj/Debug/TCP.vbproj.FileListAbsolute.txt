@@ -18,3 +18,13 @@ D:\Model\VS2012\TCP\bin\Debug\TCP.xml
 D:\Model\VS2012\TCP\obj\Debug\TCP.fmTcpClient.resources
 D:\Model\VS2012\TCP\obj\Debug\TCP.Resources.resources
 D:\Model\VS2012\TCP\obj\Debug\TCP.vbproj.GenerateResource.Cache
+D:\Model\VS2012\TCP-Motor\bin\Debug\TCP.exe.config
+D:\Model\VS2012\TCP-Motor\obj\Debug\TCP.exe
+D:\Model\VS2012\TCP-Motor\obj\Debug\TCP.xml
+D:\Model\VS2012\TCP-Motor\obj\Debug\TCP.pdb
+D:\Model\VS2012\TCP-Motor\bin\Debug\TCP.exe
+D:\Model\VS2012\TCP-Motor\bin\Debug\TCP.pdb
+D:\Model\VS2012\TCP-Motor\bin\Debug\TCP.xml
+D:\Model\VS2012\TCP-Motor\obj\Debug\TCP.fmTcpClient.resources
+D:\Model\VS2012\TCP-Motor\obj\Debug\TCP.Resources.resources
+D:\Model\VS2012\TCP-Motor\obj\Debug\TCP.vbproj.GenerateResource.Cache

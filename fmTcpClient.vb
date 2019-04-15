@@ -5,12 +5,31 @@ Public Class fmTcpClient
 
     Dim SendBuffer(0) As Byte       '发送缓存，后面会ReDim修改大小
     Dim ReadBuffer(255) As Byte     '接收缓存，后面会ReDim修改大小
+    Dim udpReadBuffer(0) As Byte
     Dim tcpClient As TcpClient
-    Dim rdStream As NetworkStream   '数据读入流
+    Dim udpClient As UdpClient
+    Dim tcp_rdStream As NetworkStream   '数据读入流
     Dim ReadThread As Thread        '读数据线程
     Dim WriteThread As Thread       '发数据线程
     Dim TcpConnected As Boolean     '连接状态
     Dim IsSending As Boolean        '发送标志位
+    Dim DeviceState As mDeviceState
+    Const udpBufferSize As Integer = 11
+    Const udpPort As Integer = 8000
+    '68H表示帧头，00H表示控制的是ALM，01H表示控制启停，01H表示启动
+    Dim fmEnableALM = New Byte() {&H68, &H0, &H1, &H1}
+    '68H表示帧头，01H表示控制的是输入电机/02表示负载电机，01H表示控制启停，01H表示启动/FFH表示反转/00H表示停止
+    Dim fmEnableMotor = New Byte() {&H68, &H1, &H1, &H1}
+    '68H表示帧头，01H表示控制的是输入电机/02表示负载电机，02H表示设定速度，最后两位表示速度值。
+    Dim fmSetSpeed = New Byte() {&H68, &H1, &H2, &H0, &H30}
+
+    Structure mDeviceState
+        Dim ALMState As Integer
+        Dim MasterDirect As String
+        Dim MasterSpeed As Double
+        Dim LoadDirect As String
+        Dim LoadSpeed As Double
+    End Structure
 
     '刷新接收数据的委托
     Public Delegate Sub deleUpdateUIByte(_byte As Byte)
@@ -18,7 +37,71 @@ Public Class fmTcpClient
     Public Delegate Sub deleUpdateUIVoid()
     '用于切换主线程上Timer的委托
     Public Delegate Sub deleUpdateUIBoolean(state As Boolean)
-    'Public Delegate Sub deleGetSendData(ByRef _bytes() As Byte)
+    '刷新显示S120系统状态
+    Public Delegate Sub deleUpdateUIStruct(_struct As mDeviceState)
+
+    Public Sub udpInit()
+        udpClient = New UdpClient(udpPort)
+        udpClient.Client.ReceiveBufferSize = udpBufferSize
+        ReDim udpReadBuffer(udpBufferSize - 1)
+        'System.Net.IPAddress.Parse(txtIP.Text)
+    End Sub
+
+    Public Sub udpReadFrame()
+        If TcpConnected Then
+            If udpClient.Available Then
+                Dim IP As System.Net.IPAddress = System.Net.IPAddress.Parse(txtIP.Text)
+                Dim EndPoint As New System.Net.IPEndPoint(IP, udpPort)
+                udpReadBuffer = udpClient.Receive(EndPoint)
+                udpFrameResolve(udpReadBuffer)
+                Dim deleUpdateDeviceState As New deleUpdateUIStruct(AddressOf UpdateDeviceState)
+                Me.Invoke(deleUpdateDeviceState, DeviceState)
+            End If
+        End If
+    End Sub
+
+    Public Sub udpFrameResolve(_data() As Byte)
+        If _data(0) = &H68 And _data(1) = 0 Then
+            DeviceState.ALMState = _data(2)
+            DeviceState.MasterSpeed = (_data(4) * 65536 + _data(5) * 256 + _data(6)) / 100
+            DeviceState.LoadSpeed = (_data(8) * 65536 + _data(9) * 256 + _data(10)) / 100
+            If _data(3) = 0 Then
+                DeviceState.MasterDirect = "Stop"
+            ElseIf _data(3) = 1 Then
+                DeviceState.MasterDirect = "Forward"
+            Else
+                DeviceState.MasterDirect = "Backward"
+            End If
+            If _data(7) = 0 Then
+                DeviceState.LoadDirect = "Stop"
+            ElseIf _data(7) = 1 Then
+                DeviceState.LoadDirect = "Forward"
+            Else
+                DeviceState.LoadDirect = "Backward"
+            End If
+        End If
+    End Sub
+
+    Public Sub UpdateDeviceState(_struct As mDeviceState)
+        If _struct.ALMState > 0 Then
+            tslbALMState.BackColor = Color.LightGreen
+            tslbALMState.Text = "ON"
+        Else
+            tslbALMState.BackColor = Color.Yellow
+            tslbALMState.Text = "OFF"
+        End If
+        If tslbALMState.Text = "ON" Then
+            pnMotorControl.Enabled = True
+            btnEnableALM.Text = "Disable ALM"
+        Else
+            pnMotorControl.Enabled = False
+            btnEnableALM.Text = "Enable ALM"
+        End If
+        txtLoadRPM.Text = DeviceState.LoadSpeed
+        txtMasterRPM.Text = DeviceState.MasterSpeed
+        txtMasterDirection.Text = DeviceState.MasterDirect
+        txtLoadDirection.Text = DeviceState.LoadDirect
+    End Sub
 
     ''' <summary>
     ''' 切换主进程的计时器状态
@@ -67,18 +150,18 @@ Public Class fmTcpClient
     ''' 从以太网接收缓存中读取数据
     ''' </summary>
     ''' <remarks></remarks>
-    Public Sub ReadBuffered()
+    Public Sub tcpReadBuffered()
         Dim index As Integer = 0
         Dim pUpdataUIByte As New deleUpdateUIByte(AddressOf RefreshReceive)
         Dim pUpdataUIBoolean As New deleUpdateUIBoolean(AddressOf ToggleTimer)
         Try
-            While rdStream.DataAvailable
+            While tcp_rdStream.DataAvailable
                 '有数据可以接收时停止计时器，否则可能与接收状态冲突
                 '用委托方法跨线程启动/停止计时器
                 Me.Invoke(pUpdataUIBoolean, False)
                 '动态调整数组大小
                 ReDim Preserve ReadBuffer(index)
-                rdStream.Read(ReadBuffer, index, 1)
+                tcp_rdStream.Read(ReadBuffer, index, 1)
                 Me.Invoke(pUpdataUIByte, ReadBuffer(index))
                 index += 1
             End While
@@ -96,7 +179,8 @@ Public Class fmTcpClient
     ''' <remarks></remarks>
     Public Sub ReadThreadFunc()
         While TcpConnected
-            ReadBuffered()
+            tcpReadBuffered()
+            'udpReadFrame()
         End While
     End Sub
 
@@ -127,10 +211,15 @@ Public Class fmTcpClient
         '初始化变量和控件
         tslbStatus.BackColor = Color.Yellow
         tslbStatus.Text = "Offline"
+        tslbALMState.BackColor = Color.Yellow
+        tslbALMState.Text = "OFF"
         IsSending = False
         TcpConnected = False
         btnSend.Enabled = False
         btnDisconnect.Enabled = False
+        pnMotorControl.Enabled = False
+        pnMotorForm.Enabled = False
+        udpInit()
     End Sub
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
@@ -172,8 +261,11 @@ Public Class fmTcpClient
         btnSend.Enabled = False
         btnDisconnect.Enabled = False
         btnConnect.Enabled = True
+        pnMotorForm.Enabled = False
         tslbStatus.BackColor = Color.Yellow
         tslbStatus.Text = "Offline"
+        tslbALMState.BackColor = Color.Yellow
+        tslbALMState.Text = "OFF"
         Timer1.Enabled = False
         '释放socket资源，否则没法进行下一次连接
         tcpClient.Close()
@@ -184,11 +276,12 @@ Public Class fmTcpClient
         btnDisconnect.Enabled = True
         btnSend.Enabled = True
         btnConnect.Enabled = False
-        tslbStatus.BackColor = Color.Green
+        tslbStatus.BackColor = Color.LightGreen
         tslbStatus.Text = "Online"
+        pnMotorForm.Enabled = True
         'Timer1用于判断连接是否存活
         Timer1.Enabled = True
-        rdStream = tcpClient.GetStream()
+        tcp_rdStream = tcpClient.GetStream()
         ReadThread = New Thread(AddressOf ReadThreadFunc)
         WriteThread = New Thread(AddressOf WriteThreadFunc)
         ReadThread.Start()
@@ -210,5 +303,80 @@ Public Class fmTcpClient
 
     Private Sub btnDisconnect_Click(sender As Object, e As EventArgs) Handles btnDisconnect.Click
         SetOffline()
+    End Sub
+    
+    Private Sub timer_udpReader_Tick(sender As Object, e As EventArgs) Handles timer_udpReader.Tick
+        udpReadFrame()
+    End Sub
+
+    Private Sub btnEnableALM_Click(sender As Object, e As EventArgs) Handles btnEnableALM.Click
+        If TcpConnected Then
+            If DeviceState.ALMState = 0 Then
+                fmEnableALM(3) = &H1
+            Else
+                fmEnableALM(3) = 0
+            End If
+            SetSendText(fmEnableALM)
+            IsSending = True
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' 将需要发送的报文添加到发送对话框
+    ''' </summary>
+    ''' <param name="_data"></param>
+    ''' <remarks></remarks>
+    Public Sub SetSendText(_data As Byte())
+        txtSend.Text = ""
+        For Each item As Byte In _data
+            txtSend.AppendText(item.ToString("X2"))
+        Next
+    End Sub
+
+    Private Sub btnStop_Click(sender As Object, e As EventArgs) Handles btnStop.Click
+        fmEnableMotor(3) = 0
+        If DeviceState.MasterDirect <> "Stop" Then
+            fmEnableMotor(1) = 1
+        End If
+        'Thread.Sleep(50) '防止数据粘连
+        If DeviceState.LoadDirect <> "Stop" Then
+            fmEnableMotor(1) = 2
+        End If
+        SetSendText(fmEnableMotor)
+        IsSending = True
+    End Sub
+
+    Private Sub btnForward_Click(sender As Object, e As EventArgs) Handles btnForward.Click
+        fmEnableMotor(3) = 1
+        If cboxAxis.Text = "Axis_Load" Then
+            fmEnableMotor(1) = 2
+        Else
+            fmEnableMotor(1) = 1
+        End If
+        SetSendText(fmEnableMotor)
+        IsSending = True
+    End Sub
+
+    Private Sub btnBackward_Click(sender As Object, e As EventArgs) Handles btnBackward.Click
+        fmEnableMotor(3) = &HFF
+        If cboxAxis.Text = "Axis_Load" Then
+            fmEnableMotor(1) = 2
+        Else
+            fmEnableMotor(1) = 1
+        End If
+        SetSendText(fmEnableMotor)
+        IsSending = True
+    End Sub
+
+    Private Sub btnSetSpeed_Click(sender As Object, e As EventArgs) Handles btnSetSpeed.Click
+        If cboxAxis.Text = "Axis_Load" Then
+            fmSetSpeed(1) = 2
+        Else
+            fmSetSpeed(1) = 1
+        End If
+        fmSetSpeed(4) = Convert.ToInt16(txtSetSpeed.Text) Mod 256
+        fmSetSpeed(3) = (Convert.ToInt16(txtSetSpeed.Text) - fmSetSpeed(4)) / 256
+        SetSendText(fmSetSpeed)
+        IsSending = True
     End Sub
 End Class

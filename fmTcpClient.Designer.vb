@@ -28,6 +28,8 @@ Partial Class fmTcpClient
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.ToolStripStatusLabel1 = New System.Windows.Forms.ToolStripStatusLabel()
         Me.tslbStatus = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.ToolStripStatusLabel2 = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.tslbALMState = New System.Windows.Forms.ToolStripStatusLabel()
         Me.txtIP = New System.Windows.Forms.TextBox()
         Me.txtPort = New System.Windows.Forms.TextBox()
         Me.Label1 = New System.Windows.Forms.Label()
@@ -38,7 +40,28 @@ Partial Class fmTcpClient
         Me.txtSend = New System.Windows.Forms.TextBox()
         Me.txtReceived = New System.Windows.Forms.TextBox()
         Me.btnDisconnect = New System.Windows.Forms.Button()
+        Me.pnMotorForm = New System.Windows.Forms.Panel()
+        Me.Label5 = New System.Windows.Forms.Label()
+        Me.pnMotorControl = New System.Windows.Forms.Panel()
+        Me.cboxAxis = New System.Windows.Forms.ComboBox()
+        Me.btnEnableALM = New System.Windows.Forms.Button()
+        Me.Label6 = New System.Windows.Forms.Label()
+        Me.txtMasterRPM = New System.Windows.Forms.TextBox()
+        Me.txtLoadRPM = New System.Windows.Forms.TextBox()
+        Me.Label7 = New System.Windows.Forms.Label()
+        Me.Label8 = New System.Windows.Forms.Label()
+        Me.txtMasterDirection = New System.Windows.Forms.TextBox()
+        Me.txtLoadDirection = New System.Windows.Forms.TextBox()
+        Me.txtSetSpeed = New System.Windows.Forms.TextBox()
+        Me.btnSetSpeed = New System.Windows.Forms.Button()
+        Me.Label9 = New System.Windows.Forms.Label()
+        Me.btnForward = New System.Windows.Forms.Button()
+        Me.btnBackward = New System.Windows.Forms.Button()
+        Me.btnStop = New System.Windows.Forms.Button()
+        Me.timer_udpReader = New System.Windows.Forms.Timer(Me.components)
         Me.StatusStrip1.SuspendLayout()
+        Me.pnMotorForm.SuspendLayout()
+        Me.pnMotorControl.SuspendLayout()
         Me.SuspendLayout()
         '
         'btnConnect
@@ -56,10 +79,10 @@ Partial Class fmTcpClient
         '
         'StatusStrip1
         '
-        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabel1, Me.tslbStatus})
-        Me.StatusStrip1.Location = New System.Drawing.Point(0, 342)
+        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabel1, Me.tslbStatus, Me.ToolStripStatusLabel2, Me.tslbALMState})
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 340)
         Me.StatusStrip1.Name = "StatusStrip1"
-        Me.StatusStrip1.Size = New System.Drawing.Size(441, 30)
+        Me.StatusStrip1.Size = New System.Drawing.Size(899, 30)
         Me.StatusStrip1.TabIndex = 1
         Me.StatusStrip1.Text = "statusbar"
         '
@@ -74,13 +97,24 @@ Partial Class fmTcpClient
         Me.tslbStatus.Name = "tslbStatus"
         Me.tslbStatus.Size = New System.Drawing.Size(0, 25)
         '
+        'ToolStripStatusLabel2
+        '
+        Me.ToolStripStatusLabel2.Name = "ToolStripStatusLabel2"
+        Me.ToolStripStatusLabel2.Size = New System.Drawing.Size(57, 25)
+        Me.ToolStripStatusLabel2.Text = "ALM: "
+        '
+        'tslbALMState
+        '
+        Me.tslbALMState.Name = "tslbALMState"
+        Me.tslbALMState.Size = New System.Drawing.Size(0, 25)
+        '
         'txtIP
         '
         Me.txtIP.Location = New System.Drawing.Point(113, 14)
         Me.txtIP.Name = "txtIP"
         Me.txtIP.Size = New System.Drawing.Size(165, 28)
         Me.txtIP.TabIndex = 2
-        Me.txtIP.Text = "192.168.1.5"
+        Me.txtIP.Text = "192.168.3.10"
         '
         'txtPort
         '
@@ -160,11 +194,200 @@ Partial Class fmTcpClient
         Me.btnDisconnect.Text = "Disconnect"
         Me.btnDisconnect.UseVisualStyleBackColor = True
         '
+        'pnMotorForm
+        '
+        Me.pnMotorForm.Controls.Add(Me.txtLoadDirection)
+        Me.pnMotorForm.Controls.Add(Me.txtLoadRPM)
+        Me.pnMotorForm.Controls.Add(Me.txtMasterDirection)
+        Me.pnMotorForm.Controls.Add(Me.txtMasterRPM)
+        Me.pnMotorForm.Controls.Add(Me.Label6)
+        Me.pnMotorForm.Controls.Add(Me.Label8)
+        Me.pnMotorForm.Controls.Add(Me.Label7)
+        Me.pnMotorForm.Controls.Add(Me.Label5)
+        Me.pnMotorForm.Controls.Add(Me.pnMotorControl)
+        Me.pnMotorForm.Controls.Add(Me.btnEnableALM)
+        Me.pnMotorForm.Dock = System.Windows.Forms.DockStyle.Right
+        Me.pnMotorForm.Location = New System.Drawing.Point(449, 0)
+        Me.pnMotorForm.Name = "pnMotorForm"
+        Me.pnMotorForm.Size = New System.Drawing.Size(450, 340)
+        Me.pnMotorForm.TabIndex = 8
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(29, 80)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(116, 18)
+        Me.Label5.TabIndex = 3
+        Me.Label5.Text = "Master RPM :"
+        '
+        'pnMotorControl
+        '
+        Me.pnMotorControl.Controls.Add(Me.btnBackward)
+        Me.pnMotorControl.Controls.Add(Me.btnStop)
+        Me.pnMotorControl.Controls.Add(Me.btnForward)
+        Me.pnMotorControl.Controls.Add(Me.btnSetSpeed)
+        Me.pnMotorControl.Controls.Add(Me.txtSetSpeed)
+        Me.pnMotorControl.Controls.Add(Me.cboxAxis)
+        Me.pnMotorControl.Controls.Add(Me.Label9)
+        Me.pnMotorControl.Dock = System.Windows.Forms.DockStyle.Right
+        Me.pnMotorControl.Location = New System.Drawing.Point(170, 0)
+        Me.pnMotorControl.Name = "pnMotorControl"
+        Me.pnMotorControl.Size = New System.Drawing.Size(280, 340)
+        Me.pnMotorControl.TabIndex = 2
+        '
+        'cboxAxis
+        '
+        Me.cboxAxis.FormattingEnabled = True
+        Me.cboxAxis.Items.AddRange(New Object() {"Axis_Master", "Axis_Load"})
+        Me.cboxAxis.Location = New System.Drawing.Point(69, 52)
+        Me.cboxAxis.Name = "cboxAxis"
+        Me.cboxAxis.Size = New System.Drawing.Size(130, 26)
+        Me.cboxAxis.TabIndex = 1
+        Me.cboxAxis.Text = "Axis_Master"
+        '
+        'btnEnableALM
+        '
+        Me.btnEnableALM.Location = New System.Drawing.Point(6, 30)
+        Me.btnEnableALM.Name = "btnEnableALM"
+        Me.btnEnableALM.Size = New System.Drawing.Size(155, 34)
+        Me.btnEnableALM.TabIndex = 0
+        Me.btnEnableALM.Text = "Enable ALM"
+        Me.btnEnableALM.UseVisualStyleBackColor = True
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(29, 203)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(98, 18)
+        Me.Label6.TabIndex = 3
+        Me.Label6.Text = "Load RPM :"
+        '
+        'txtMasterRPM
+        '
+        Me.txtMasterRPM.BackColor = System.Drawing.SystemColors.ControlLightLight
+        Me.txtMasterRPM.Location = New System.Drawing.Point(21, 101)
+        Me.txtMasterRPM.Name = "txtMasterRPM"
+        Me.txtMasterRPM.ReadOnly = True
+        Me.txtMasterRPM.Size = New System.Drawing.Size(124, 28)
+        Me.txtMasterRPM.TabIndex = 4
+        Me.txtMasterRPM.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'txtLoadRPM
+        '
+        Me.txtLoadRPM.BackColor = System.Drawing.SystemColors.ControlLightLight
+        Me.txtLoadRPM.Location = New System.Drawing.Point(21, 224)
+        Me.txtLoadRPM.Name = "txtLoadRPM"
+        Me.txtLoadRPM.ReadOnly = True
+        Me.txtLoadRPM.Size = New System.Drawing.Size(124, 28)
+        Me.txtLoadRPM.TabIndex = 4
+        Me.txtLoadRPM.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'Label7
+        '
+        Me.Label7.AutoSize = True
+        Me.Label7.Location = New System.Drawing.Point(3, 132)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(161, 18)
+        Me.Label7.TabIndex = 3
+        Me.Label7.Text = "Master Direction:"
+        '
+        'Label8
+        '
+        Me.Label8.AutoSize = True
+        Me.Label8.Location = New System.Drawing.Point(18, 254)
+        Me.Label8.Name = "Label8"
+        Me.Label8.Size = New System.Drawing.Size(143, 18)
+        Me.Label8.TabIndex = 3
+        Me.Label8.Text = "Load Direction:"
+        '
+        'txtMasterDirection
+        '
+        Me.txtMasterDirection.BackColor = System.Drawing.SystemColors.ControlLightLight
+        Me.txtMasterDirection.Location = New System.Drawing.Point(21, 153)
+        Me.txtMasterDirection.Name = "txtMasterDirection"
+        Me.txtMasterDirection.ReadOnly = True
+        Me.txtMasterDirection.Size = New System.Drawing.Size(124, 28)
+        Me.txtMasterDirection.TabIndex = 4
+        Me.txtMasterDirection.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'txtLoadDirection
+        '
+        Me.txtLoadDirection.BackColor = System.Drawing.SystemColors.ControlLightLight
+        Me.txtLoadDirection.Location = New System.Drawing.Point(21, 275)
+        Me.txtLoadDirection.Name = "txtLoadDirection"
+        Me.txtLoadDirection.ReadOnly = True
+        Me.txtLoadDirection.Size = New System.Drawing.Size(124, 28)
+        Me.txtLoadDirection.TabIndex = 4
+        Me.txtLoadDirection.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'txtSetSpeed
+        '
+        Me.txtSetSpeed.Location = New System.Drawing.Point(79, 132)
+        Me.txtSetSpeed.Name = "txtSetSpeed"
+        Me.txtSetSpeed.Size = New System.Drawing.Size(99, 28)
+        Me.txtSetSpeed.TabIndex = 2
+        Me.txtSetSpeed.Text = "200"
+        Me.txtSetSpeed.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'btnSetSpeed
+        '
+        Me.btnSetSpeed.Location = New System.Drawing.Point(184, 129)
+        Me.btnSetSpeed.Name = "btnSetSpeed"
+        Me.btnSetSpeed.Size = New System.Drawing.Size(84, 31)
+        Me.btnSetSpeed.TabIndex = 3
+        Me.btnSetSpeed.Text = "Set"
+        Me.btnSetSpeed.UseVisualStyleBackColor = True
+        '
+        'Label9
+        '
+        Me.Label9.AutoSize = True
+        Me.Label9.Location = New System.Drawing.Point(20, 138)
+        Me.Label9.Name = "Label9"
+        Me.Label9.Size = New System.Drawing.Size(53, 18)
+        Me.Label9.TabIndex = 3
+        Me.Label9.Text = "RPM :"
+        '
+        'btnForward
+        '
+        Me.btnForward.Location = New System.Drawing.Point(14, 190)
+        Me.btnForward.Name = "btnForward"
+        Me.btnForward.Size = New System.Drawing.Size(124, 31)
+        Me.btnForward.TabIndex = 3
+        Me.btnForward.Text = "Forward"
+        Me.btnForward.UseVisualStyleBackColor = True
+        '
+        'btnBackward
+        '
+        Me.btnBackward.Location = New System.Drawing.Point(144, 190)
+        Me.btnBackward.Name = "btnBackward"
+        Me.btnBackward.Size = New System.Drawing.Size(124, 31)
+        Me.btnBackward.TabIndex = 3
+        Me.btnBackward.Text = "Backward"
+        Me.btnBackward.UseVisualStyleBackColor = True
+        '
+        'btnStop
+        '
+        Me.btnStop.Font = New System.Drawing.Font("Segoe UI Symbol", 18.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnStop.Location = New System.Drawing.Point(14, 241)
+        Me.btnStop.Name = "btnStop"
+        Me.btnStop.Size = New System.Drawing.Size(254, 62)
+        Me.btnStop.TabIndex = 3
+        Me.btnStop.Text = "STOP"
+        Me.btnStop.UseVisualStyleBackColor = True
+        '
+        'timer_udpReader
+        '
+        Me.timer_udpReader.Enabled = True
+        Me.timer_udpReader.Interval = 200
+        '
         'fmTcpClient
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 18.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(441, 372)
+        Me.ClientSize = New System.Drawing.Size(899, 370)
+        Me.Controls.Add(Me.pnMotorForm)
         Me.Controls.Add(Me.btnDisconnect)
         Me.Controls.Add(Me.txtReceived)
         Me.Controls.Add(Me.txtSend)
@@ -183,6 +406,10 @@ Partial Class fmTcpClient
         Me.Text = "TcpClient"
         Me.StatusStrip1.ResumeLayout(False)
         Me.StatusStrip1.PerformLayout()
+        Me.pnMotorForm.ResumeLayout(False)
+        Me.pnMotorForm.PerformLayout()
+        Me.pnMotorControl.ResumeLayout(False)
+        Me.pnMotorControl.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -202,5 +429,26 @@ Partial Class fmTcpClient
     Friend WithEvents txtSend As System.Windows.Forms.TextBox
     Friend WithEvents txtReceived As System.Windows.Forms.TextBox
     Friend WithEvents btnDisconnect As System.Windows.Forms.Button
+    Friend WithEvents pnMotorForm As System.Windows.Forms.Panel
+    Friend WithEvents cboxAxis As System.Windows.Forms.ComboBox
+    Friend WithEvents btnEnableALM As System.Windows.Forms.Button
+    Friend WithEvents pnMotorControl As System.Windows.Forms.Panel
+    Friend WithEvents ToolStripStatusLabel2 As System.Windows.Forms.ToolStripStatusLabel
+    Friend WithEvents tslbALMState As System.Windows.Forms.ToolStripStatusLabel
+    Friend WithEvents Label5 As System.Windows.Forms.Label
+    Friend WithEvents txtLoadDirection As System.Windows.Forms.TextBox
+    Friend WithEvents txtLoadRPM As System.Windows.Forms.TextBox
+    Friend WithEvents txtMasterDirection As System.Windows.Forms.TextBox
+    Friend WithEvents txtMasterRPM As System.Windows.Forms.TextBox
+    Friend WithEvents Label6 As System.Windows.Forms.Label
+    Friend WithEvents Label8 As System.Windows.Forms.Label
+    Friend WithEvents Label7 As System.Windows.Forms.Label
+    Friend WithEvents btnBackward As System.Windows.Forms.Button
+    Friend WithEvents btnStop As System.Windows.Forms.Button
+    Friend WithEvents btnForward As System.Windows.Forms.Button
+    Friend WithEvents btnSetSpeed As System.Windows.Forms.Button
+    Friend WithEvents txtSetSpeed As System.Windows.Forms.TextBox
+    Friend WithEvents Label9 As System.Windows.Forms.Label
+    Friend WithEvents timer_udpReader As System.Windows.Forms.Timer
 
 End Class
