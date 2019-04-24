@@ -2,7 +2,8 @@
 Imports System.Threading
 
 Public Class fmTcpClient
-
+    Dim sm As New SIMOTION.SimotionSystem("192.168.1.2", , 300)
+    Dim mm As New SIMOTION.SimotionMotor("main")
     Dim SendBuffer(0) As Byte       '发送缓存，后面会ReDim修改大小
     Dim ReadBuffer(255) As Byte     '接收缓存，后面会ReDim修改大小
     Dim udpReadBuffer(0) As Byte
@@ -217,9 +218,15 @@ Public Class fmTcpClient
         TcpConnected = False
         btnSend.Enabled = False
         btnDisconnect.Enabled = False
-        pnMotorControl.Enabled = False
-        pnMotorForm.Enabled = False
+        pnMotorControl.Enabled = True
+        pnMotorForm.Enabled = True
         udpInit()
+
+
+        Debug.Print(sm.IPAddress)
+        PropertyGrid1.SelectedObject = sm
+        PropertyGrid2.SelectedObject = mm
+        mm.AxisName = "ll"
     End Sub
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick

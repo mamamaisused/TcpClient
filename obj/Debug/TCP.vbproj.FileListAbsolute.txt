@@ -28,3 +28,4 @@ D:\Model\VS2012\TCP-Motor\bin\Debug\TCP.xml
 D:\Model\VS2012\TCP-Motor\obj\Debug\TCP.fmTcpClient.resources
 D:\Model\VS2012\TCP-Motor\obj\Debug\TCP.Resources.resources
 D:\Model\VS2012\TCP-Motor\obj\Debug\TCP.vbproj.GenerateResource.Cache
+D:\Model\VS2012\TCP-Motor\obj\Debug\TCP.newClient.resources

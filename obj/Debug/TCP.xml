@@ -6,7 +6,57 @@ TCP
 </name>
 </assembly>
 <members>
-<member name="M:TCP.fmTcpClient.ToggleTimer(System.Boolean)">
+<member name="M:TCP.SIMOTION.SimotionSystem.#ctor(System.String,System.Int32,System.Int32)">
+	<summary>
+ 实例化函数
+ </summary>
+	<param name="valIPAddress">系统的IP地址</param>
+	<param name="valLocalTcpPort">本地的TCP端口号</param>
+	<param name="valRemoteUdpPort">远端的UDP端口号</param>
+	<remarks></remarks>
+</member><member name="M:TCP.SIMOTION.SimotionSystem.TcpConnect(System.Int32)">
+	<summary>
+ 与SIMOTION系统建立连接
+ </summary>
+	<param name="valTimeOut">连接的超时时间，默认1.5秒</param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:TCP.SIMOTION.SimotionSystem.TcpClose">
+	<summary>
+ 断开TCP连接
+ </summary>
+	<remarks></remarks>
+</member><member name="M:TCP.SIMOTION.SimotionSystem.GetTcpConnectState">
+	<summary>
+ 查询当前的连接状态
+ </summary>
+	<returns>在线返回true，掉线返回false</returns>
+	<remarks></remarks>
+</member><member name="M:TCP.SIMOTION.SimotionSystem.TcpSend">
+	<summary>
+ 发送TcpSendBuffer中的数据
+ </summary>
+	<remarks></remarks>
+</member><member name="M:TCP.SIMOTION.SimotionSystem.TcpSend(System.Byte[])">
+	<summary>
+ 发送帧数据
+ </summary>
+	<param name="valSendBuffer">待发送的数据</param>
+	<remarks></remarks>
+</member><member name="M:TCP.SIMOTION.SimotionSystem.UdpFrameResolve(System.Object)">
+	<summary>
+ 解析Udp的数据并且更新设备状态信息
+ </summary>
+	<param name="valReadBuffer">需要解析的数据</param>
+	<remarks></remarks>
+</member><member name="M:TCP.SIMOTION.SimotionSystem.UdpRead(System.Object@)">
+	<summary>
+ 读取Udp数据到refReadBuffer中
+ </summary>
+	<param name="refReadBuffer">存入的缓存</param>
+	<returns>读取成功返回true否则false</returns>
+	<remarks></remarks>
+</member><member name="M:TCP.fmTcpClient.ToggleTimer(System.Boolean)">
 	<summary>
  切换主进程的计时器状态
  </summary>
