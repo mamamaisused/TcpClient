@@ -3,7 +3,7 @@ Imports System.Threading
 
 Public Class fmTcpClient
     Dim sm As New SIMOTION.SimotionSystem("192.168.1.2", , 300)
-    Dim mm As New SIMOTION.SimotionMotor("main")
+    Dim mm As New SIMOTION.SimotionMotor("main", 0)
     Dim SendBuffer(0) As Byte       '发送缓存，后面会ReDim修改大小
     Dim ReadBuffer(255) As Byte     '接收缓存，后面会ReDim修改大小
     Dim udpReadBuffer(0) As Byte

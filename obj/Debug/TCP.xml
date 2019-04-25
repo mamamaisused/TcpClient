@@ -6,57 +6,7 @@ TCP
 </name>
 </assembly>
 <members>
-<member name="M:TCP.SIMOTION.SimotionSystem.#ctor(System.String,System.Int32,System.Int32)">
-	<summary>
- 实例化函数
- </summary>
-	<param name="valIPAddress">系统的IP地址</param>
-	<param name="valLocalTcpPort">本地的TCP端口号</param>
-	<param name="valRemoteUdpPort">远端的UDP端口号</param>
-	<remarks></remarks>
-</member><member name="M:TCP.SIMOTION.SimotionSystem.TcpConnect(System.Int32)">
-	<summary>
- 与SIMOTION系统建立连接
- </summary>
-	<param name="valTimeOut">连接的超时时间，默认1.5秒</param>
-	<returns></returns>
-	<remarks></remarks>
-</member><member name="M:TCP.SIMOTION.SimotionSystem.TcpClose">
-	<summary>
- 断开TCP连接
- </summary>
-	<remarks></remarks>
-</member><member name="M:TCP.SIMOTION.SimotionSystem.GetTcpConnectState">
-	<summary>
- 查询当前的连接状态
- </summary>
-	<returns>在线返回true，掉线返回false</returns>
-	<remarks></remarks>
-</member><member name="M:TCP.SIMOTION.SimotionSystem.TcpSend">
-	<summary>
- 发送TcpSendBuffer中的数据
- </summary>
-	<remarks></remarks>
-</member><member name="M:TCP.SIMOTION.SimotionSystem.TcpSend(System.Byte[])">
-	<summary>
- 发送帧数据
- </summary>
-	<param name="valSendBuffer">待发送的数据</param>
-	<remarks></remarks>
-</member><member name="M:TCP.SIMOTION.SimotionSystem.UdpFrameResolve(System.Object)">
-	<summary>
- 解析Udp的数据并且更新设备状态信息
- </summary>
-	<param name="valReadBuffer">需要解析的数据</param>
-	<remarks></remarks>
-</member><member name="M:TCP.SIMOTION.SimotionSystem.UdpRead(System.Object@)">
-	<summary>
- 读取Udp数据到refReadBuffer中
- </summary>
-	<param name="refReadBuffer">存入的缓存</param>
-	<returns>读取成功返回true否则false</returns>
-	<remarks></remarks>
-</member><member name="M:TCP.fmTcpClient.ToggleTimer(System.Boolean)">
+<member name="M:TCP.fmTcpClient.ToggleTimer(System.Boolean)">
 	<summary>
  切换主进程的计时器状态
  </summary>
@@ -94,6 +44,116 @@ TCP
  将需要发送的报文添加到发送对话框
  </summary>
 	<param name="_data"></param>
+	<remarks></remarks>
+</member><member name="M:TCP.SIMOTION.SimotionSystem.#ctor(System.String,System.Int32,System.Int32)">
+	<summary>
+ 实例化函数
+ </summary>
+	<param name="valIPAddress">系统的IP地址</param>
+	<param name="valLocalTcpPort">本地的TCP端口号</param>
+	<param name="valRemoteUdpPort">远端的UDP端口号</param>
+	<remarks></remarks>
+</member><member name="M:TCP.SIMOTION.SimotionSystem.TcpConnect(System.Int32)">
+	<summary>
+ 与SIMOTION系统建立连接
+ </summary>
+	<param name="valTimeOut">连接的超时时间，默认1.5秒</param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:TCP.SIMOTION.SimotionSystem.TcpClose">
+	<summary>
+ 断开TCP连接
+ </summary>
+	<remarks></remarks>
+</member><member name="M:TCP.SIMOTION.SimotionSystem.GetTcpConnectState">
+	<summary>
+ 查询当前的连接状态
+ </summary>
+	<returns>在线返回true，掉线返回false</returns>
+	<remarks></remarks>
+</member><member name="M:TCP.SIMOTION.SimotionSystem.TcpSend">
+	<summary>
+ 发送TcpSendBuffer中的数据
+ </summary>
+	<remarks></remarks>
+</member><member name="M:TCP.SIMOTION.SimotionSystem.TcpSend(System.Byte[])">
+	<summary>
+ 发送帧数据
+ </summary>
+	<param name="valSendBuffer">待发送的数据</param>
+	<remarks></remarks>
+</member><member name="M:TCP.SIMOTION.SimotionSystem.UdpFrameResolve(System.Byte[])">
+	<summary>
+ 解析Udp的数据并且更新设备状态信息
+ </summary>
+	<param name="valReadBuffer">需要解析的数据</param>
+	<returns>解析后的结构体</returns>
+	<remarks></remarks>
+</member><member name="M:TCP.SIMOTION.SimotionSystem.UdpRead(System.Object@)">
+	<summary>
+ 读取Udp数据到refReadBuffer中
+ </summary>
+	<param name="refReadBuffer">存入的缓存</param>
+	<returns>读取成功返回true否则false</returns>
+	<remarks></remarks>
+</member><member name="M:TCP.SIMOTION.SimotionSystem.EnableALM">
+	<summary>
+ 使能ALM电源
+ </summary>
+	<remarks>在控制电机前必须启动电机电源</remarks>
+</member><member name="M:TCP.SIMOTION.SimotionSystem.DisableALM">
+	<summary>
+ 停止ALM电源
+ </summary>
+	<remarks></remarks>
+</member><member name="M:TCP.SIMOTION.SimotionSystem.SwitchAxisMode(TCP.SIMOTION.SimotionMotor,TCP.SIMOTION.AXISOPERATEMODE,System.Double,System.Double)">
+	<summary>
+ 切换电机的运行状态
+ </summary>
+	<param name="_simotionmotor">被切换的电机</param>
+	<param name="_mode">切换到的模式</param>
+	<remarks></remarks>
+</member><member name="M:TCP.SIMOTION.SimotionSystem.SetAxisCommand(TCP.SIMOTION.sCMD)">
+	<summary>
+ 下发指定的CMD
+ </summary>
+	<param name="_sCMD">被下发的CMD</param>
+	<remarks></remarks>
+</member><member name="M:TCP.SIMOTION.SimotionSystem.SetAxisCommand(TCP.SIMOTION.sCMD,TCP.SIMOTION.sCMD@)">
+	<summary>
+ 将_sourceCMD的值配置到_destCMD中，并下发到电机控制器
+ 电机控制器通过Index来判断消息是发给谁的
+ </summary>
+	<param name="_sourceCMD">设置内容</param>
+	<param name="_destCMD">被赋值的控制CMD</param>
+	<remarks></remarks>
+</member><member name="M:TCP.SIMOTION.SimotionSystem.GetAxisState(TCP.SIMOTION.sAxisStatus@)">
+	<summary>
+ 获取轴状态并保存到refAxisState中
+ </summary>
+	<param name="refAxisState">存入的状态结构体</param>
+	<remarks></remarks>
+</member><member name="M:TCP.SIMOTION.SimotionSystem.StructToByte(System.Object)">
+	<summary>
+ 结构体转字节流
+ </summary>
+	<param name="valStruct">需要被转换的结构体</param>
+	<returns>转换结果</returns>
+	<remarks></remarks>
+</member><member name="M:TCP.SIMOTION.SimotionSystem.ByteToStruct(System.Byte[],System.Type)">
+	<summary>
+ 字节流转结构体
+ </summary>
+	<param name="_bytes">被转换的字节数组</param>
+	<param name="_structType">用.GetType()得到的类型</param>
+	<returns></returns>
+	<remarks></remarks>
+</member><member name="M:TCP.SIMOTION.SimotionMotor.#ctor(System.String,System.Int32)">
+	<summary>
+ New方法
+ </summary>
+	<param name="valAxisName">在Simotion中的名称</param>
+	<param name="valIndex">在Simotion中的编号</param>
 	<remarks></remarks>
 </member><member name="P:TCP.My.Resources.Resources.ResourceManager">
 	<summary>

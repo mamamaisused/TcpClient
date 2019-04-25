@@ -1,5 +1,6 @@
 ﻿Imports System.Net.Sockets
 Imports System.ComponentModel
+Imports System.Runtime.InteropServices
 Namespace SIMOTION
     '*******************************************************
     '********************SIMOTION系统***********************
@@ -12,15 +13,18 @@ Namespace SIMOTION
         ''' <param name="valLocalTcpPort">本地的TCP端口号</param>
         ''' <param name="valRemoteUdpPort">远端的UDP端口号</param>
         ''' <remarks></remarks>
-        Public Sub New(valIPAddress As String, Optional valLocalTcpPort As Integer = 8000, Optional valRemoteUdpPort As Integer = 8000)
+        Public Sub New(valIPAddress As String, Optional valLocalTcpPort As Integer = 3000, Optional valRemoteUdpPort As Integer = 8000)
             _IPAddress = System.Net.IPAddress.Parse(valIPAddress)
             LocalTcpPort = valLocalTcpPort
             RemoteUdpPort = valRemoteUdpPort
             UdpEndPoint = New System.Net.IPEndPoint(_IPAddress, RemoteUdpPort)
+            UdpComm = New UdpClient(RemoteUdpPort)
+            UdpComm.Client.ReceiveBufferSize = Marshal.SizeOf(Axis_Master.g_Axis_Status)
+            ReDim _UdpReadBuffer(Marshal.SizeOf(Axis_Master.g_Axis_Status) - 1)
         End Sub
 
 #Region "TCP通信"
-        'TCP通信
+
         Public TcpComm As TcpClient
         Private _TcpConnected As Boolean = False
 
@@ -165,10 +169,14 @@ Namespace SIMOTION
         ''' 解析Udp的数据并且更新设备状态信息
         ''' </summary>
         ''' <param name="valReadBuffer">需要解析的数据</param>
+        ''' <returns>解析后的结构体</returns>
         ''' <remarks></remarks>
-        Public Sub UdpFrameResolve(ByVal valReadBuffer)
-
-        End Sub
+        Public Function UdpFrameResolve(ByVal valReadBuffer As Byte()) As Object
+            Dim _sAxisStatus As sAxisStatus
+            '解析过程
+            _sAxisStatus = ByteToStruct(valReadBuffer, _sAxisStatus.GetType)
+            Return _sAxisStatus
+        End Function
 
         ''' <summary>
         ''' 读取Udp数据到refReadBuffer中
@@ -225,10 +233,136 @@ Namespace SIMOTION
 #Region "电机"
         <DescriptionAttribute("输入端电机")> _
         <TypeConverter(GetType(ExpandableObjectConverter))> _
-        Public Property Axis_Master As New SimotionMotor("Axis_Master")
+        Public Property Axis_Master As New SimotionMotor("Axis_Master", valIndex:=1)
         <DescriptionAttribute("负载电机")> _
         <TypeConverter(GetType(ExpandableObjectConverter))> _
-        Public Property Axis_Load As New SimotionMotor("Axis_Load")
+        Public Property Axis_Load As New SimotionMotor("Axis_Load", valIndex:=2)
+
+        ''' <summary>
+        ''' 使能ALM电源
+        ''' </summary>
+        ''' <remarks>在控制电机前必须启动电机电源</remarks>
+        Public Sub EnableALM()
+            TcpSend(Frame.Frame_Enable_ALM)
+            g_Enable_ALM = True
+        End Sub
+
+        ''' <summary>
+        ''' 停止ALM电源
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Sub DisableALM()
+            TcpSend(Frame.Frame_Disable_ALM)
+            g_Enable_ALM = False
+        End Sub
+
+        ''' <summary>
+        ''' 切换电机的运行状态
+        ''' </summary>
+        ''' <param name="_simotionmotor">被切换的电机</param>
+        ''' <param name="_mode">切换到的模式</param>
+        ''' <remarks></remarks>
+        Public Sub SwitchAxisMode(_simotionmotor As SimotionMotor, _mode As AXISOPERATEMODE, Optional _velocity As Double = 0, Optional _torque As Double = 0)
+            Select Case _mode
+                Case AXISOPERATEMODE.IDLE
+                    '停止转动
+                    _simotionmotor.SetVelocityMoveValue(0)
+                    '去使能
+                    _simotionmotor.SetEnableAxisValue(0)
+                    _simotionmotor.SetVelocity(0)
+                    _simotionmotor.SetTorqueLimit(0)
+                    _simotionmotor.SetEnableTorqueLimitValue(0)
+                Case AXISOPERATEMODE.RUNNING
+                    _simotionmotor.SetVelocity(_velocity)
+                    _simotionmotor.SetTorqueLimit(_torque)
+                    _simotionmotor.SetEnableTorqueLimitValue(1)
+                    _simotionmotor.SetEnableAxisValue(1)
+                    _simotionmotor.SetVelocityMoveValue(1)
+            End Select
+            SetAxisCommand(_simotionmotor.g_Axis_CMD)
+        End Sub
+
+        ''' <summary>
+        ''' 下发指定的CMD
+        ''' </summary>
+        ''' <param name="_sCMD">被下发的CMD</param>
+        ''' <remarks></remarks>
+        Public Overloads Sub SetAxisCommand(ByVal _sCMD As sCMD)
+            SetAxisCommand(_sCMD, _sCMD)
+        End Sub
+
+        ''' <summary>
+        ''' 将_sourceCMD的值配置到_destCMD中，并下发到电机控制器
+        ''' 电机控制器通过Index来判断消息是发给谁的
+        ''' </summary>
+        ''' <param name="_sourceCMD">设置内容</param>
+        ''' <param name="_destCMD">被赋值的控制CMD</param>
+        ''' <remarks></remarks>
+        Public Overloads Sub SetAxisCommand(ByVal _sourceCMD As sCMD, ByRef _destCMD As sCMD)
+            If _sourceCMD.AxisIndex <> _destCMD.AxisIndex Then
+                'AxisIndex不能用这种方式修改
+                _sourceCMD.AxisIndex = _destCMD.AxisIndex
+            End If
+            _destCMD = _sourceCMD
+            '结构体转字节流
+            ReDim _TcpSendBuffer(Marshal.SizeOf(_sourceCMD))
+            _TcpSendBuffer = StructToByte(_sourceCMD)
+            '通过Tcp下发
+            TcpSend()
+        End Sub
+
+        ''' <summary>
+        ''' 获取轴状态并保存到refAxisState中
+        ''' </summary>
+        ''' <param name="refAxisState">存入的状态结构体</param>
+        ''' <remarks></remarks>
+        Public Sub GetAxisState(ByRef refAxisState As sAxisStatus)
+            '读数据
+            UdpRead(_UdpReadBuffer)
+            '解析数据
+            If refAxisState.AxisIndex = _UdpReadBuffer(0) Then
+                refAxisState = UdpFrameResolve(_UdpReadBuffer)
+            End If
+            _g_ALM_Actived = refAxisState.g_ALM_Actived
+        End Sub
+
+        ''' <summary>
+        ''' 结构体转字节流
+        ''' </summary>
+        ''' <param name="valStruct">需要被转换的结构体</param>
+        ''' <returns>转换结果</returns>
+        ''' <remarks></remarks>
+        Public Function StructToByte(valStruct As Object) As Byte()
+            Dim _size As Integer = Marshal.SizeOf(valStruct)
+            Dim _buffer As IntPtr = Marshal.AllocHGlobal(_size)
+            Try
+                Marshal.StructureToPtr(valStruct, _buffer, False)
+                Dim _bytes(_size - 1) As Byte
+                Marshal.Copy(_buffer, _bytes, 0, _size)
+                Return _bytes
+            Finally
+                Marshal.FreeHGlobal(_buffer)
+            End Try
+        End Function
+
+        ''' <summary>
+        ''' 字节流转结构体
+        ''' </summary>
+        ''' <param name="_bytes">被转换的字节数组</param>
+        ''' <param name="_structType">用.GetType()得到的类型</param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function ByteToStruct(_bytes As Byte(), _structType As Type) As Object
+            Dim _size As Integer = Marshal.SizeOf(_structType)
+            Dim _buffer As IntPtr = Marshal.AllocHGlobal(_size)
+            Try
+                Marshal.Copy(_bytes, 0, _buffer, _size)
+                Return Marshal.PtrToStructure(_buffer, _structType)
+            Finally
+                Marshal.FreeHGlobal(_buffer)
+            End Try
+        End Function
+
 #End Region
     End Class
     'End of SimotionSystem
@@ -237,9 +371,42 @@ Namespace SIMOTION
     '***********电机类，一个系统两台电机***********************
     '**********************************************************
     Public Class SimotionMotor
-        Public Sub New(valAxisName As String)
+        ''' <summary>
+        ''' New方法
+        ''' </summary>
+        ''' <param name="valAxisName">在Simotion中的名称</param>
+        ''' <param name="valIndex">在Simotion中的编号</param>
+        ''' <remarks></remarks>
+        Public Sub New(valAxisName As String, valIndex As Integer)
             _AxisName = valAxisName
+            _Index = valIndex
+            _g_Axis_CMD.AxisIndex = valIndex
+            _g_Axis_CMD.Head = Frame.Head_Control
+            _AxisMode = AXISOPERATEMODE.ALMOFF
+            _g_Axis_Status.AxisIndex = valIndex
         End Sub
+
+#Region "配置CMD"
+        Public Sub SetVelocity(value As Double)
+            _g_Axis_CMD.VelocitySet = value
+        End Sub
+
+        Public Sub SetTorqueLimit(value As Double)
+            _g_Axis_CMD.TorqueLimitValue = value
+        End Sub
+
+        Public Sub SetEnableAxisValue(value As Byte)
+            _g_Axis_CMD.EnableAxis = value
+        End Sub
+
+        Public Sub SetEnableTorqueLimitValue(value As Byte)
+            _g_Axis_CMD.EnableTorqueLimit = value
+        End Sub
+
+        Public Sub SetVelocityMoveValue(value As Byte)
+            _g_Axis_CMD.VelocityMove = value
+        End Sub
+#End Region
 
         Private _AxisName As String
         <DescriptionAttribute("SCOUT软件中轴的名称")> _
@@ -252,9 +419,21 @@ Namespace SIMOTION
             End Get
         End Property
 
+        <DescriptionAttribute("电机的运行状态")> _
+        Public Property AxisMode As AXISOPERATEMODE
+
+        Private _Index As Integer
+
+        <DescriptionAttribute("在Scout中的编号，不要随意修改")> _
+        Public ReadOnly Property Index As Integer
+            Get
+                Return _Index
+            End Get
+        End Property
+
         <DescriptionAttribute("电机控制指令结构体")> _
         <TypeConverter(GetType(ExpandableObjectConverter))> _
-        Public Property g_Axis_CMD As sCMD = sCMD.Instance
+        Public Property g_Axis_CMD As sCMD
 
         <DescriptionAttribute("电机状态结构体")> _
         <TypeConverter(GetType(ExpandableObjectConverter))> _
@@ -264,22 +443,36 @@ Namespace SIMOTION
     'End of SimotionMotor
 
     '轴状态的结构体
+    <StructLayout(LayoutKind.Sequential, CharSet:=CharSet.Auto, Pack:=1)> _
     Public Structure sAxisStatus
-        Private _AxisFault As Boolean
-        Private _AxisEnabled As Boolean
+
+        Private _AxisIndex As Byte
+        Private _AxisFault As Byte 'boolean占四个字节，所以用byte存储布尔量
+        Private _AxisEnabled As Byte
         Private _AxisActualRPM As Double
-        Private _AxisActualTorque As Double
-        Private _AxisActualCurrent As Double
-        Private _AxisActualTemp As Double
+        Private _AxisActualTorque As Single
+        Private _AxisActualCurrent As Single
+        Private _AxisActualTemp As Single
+        Public g_ALM_Actived As Byte '系统ALM状态
+
+        <DescriptionAttribute("指明是哪个轴的信息")> _
+        Property AxisIndex As Byte
+            Set(value As Byte)
+                _AxisIndex = value
+            End Set
+            Get
+                Return _AxisIndex
+            End Get
+        End Property
 
         <DescriptionAttribute("轴故障状态指示，True表示有故障")> _
-        ReadOnly Property AxisFault As Boolean
+        ReadOnly Property AxisFault As Byte
             Get
                 Return _AxisFault
             End Get
         End Property
         <DescriptionAttribute("轴是否使能")> _
-        ReadOnly Property AxisEnabled As Boolean
+        ReadOnly Property AxisEnabled As Byte
             Get
                 Return _AxisEnabled
             End Get
@@ -291,19 +484,19 @@ Namespace SIMOTION
             End Get
         End Property
         <DescriptionAttribute("轴的转矩")> _
-        ReadOnly Property AxisActualTorque As Double
+        ReadOnly Property AxisActualTorque As Single
             Get
                 Return _AxisActualTorque
             End Get
         End Property
         <DescriptionAttribute("轴的电流")> _
-        ReadOnly Property AxisActualCurrent As Double
+        ReadOnly Property AxisActualCurrent As Single
             Get
                 Return _AxisActualCurrent
             End Get
         End Property
         <DescriptionAttribute("轴的温度")> _
-        ReadOnly Property AxisActualTemp As Double
+        ReadOnly Property AxisActualTemp As Single
             Get
                 Return _AxisActualTemp
             End Get
@@ -312,7 +505,7 @@ Namespace SIMOTION
     'End of sAxisStatus
 
     '轴控制的结构体
-    '***************主动加载****************
+    '***************主动加载：速度/转矩****************
     '1. EnableAxis = True
     '2. TorqueLimitValue = 设定值
     '3. EnableTorqueLimit = True
@@ -320,39 +513,32 @@ Namespace SIMOTION
     '5. VelocityMove = True
     '***************停止主动加载************
     '1. VelocityMove = False
-    '2. EnableTorqueLimit = False
-    '3. EnableAxis = False
+    '2. EnableAxis = False
     '***************作为负载****************
-    '0. 停止所有转动
+    '0. VelocityMove = False
     '1. TorqueLimitValue = 0
-    '2. EnableAxis = True
-    '3. EnableTorqueLimit = True
+    '2. EnableTorqueLimit = True
+    '3. EnableAxis = True
+    <StructLayout(LayoutKind.Sequential, CharSet:=CharSet.Auto, Pack:=1)> _
     Public Structure sCMD
-        Public Shared Function Instance()
-            Dim _sCMD As sCMD
-            _sCMD.EnableAxis = False
-            _sCMD.EnableTorqueLimit = False
-            _sCMD.JogBW = False
-            _sCMD.JogFW = False
-            _sCMD.JogVelocitySet = 0.0
-            _sCMD.TorqueLimitValue = 0.0
-            _sCMD.VelocityMove = False
-            Return _sCMD
-        End Function
+        <DescriptionAttribute("控制帧头")> _
+        Property Head As Byte
+        <DescriptionAttribute("轴的编号")> _
+        Property AxisIndex As Byte
         <DescriptionAttribute("使能轴控制")> _
-        Property EnableAxis As Boolean
-        <DescriptionAttribute("'点动正转控制，True表示正转")> _
-        Property JogFW As Boolean
+        Property EnableAxis As Byte 'boolean类型占四个字节，所以用Byte储存
+        <DescriptionAttribute("点动正转控制，True表示正转")> _
+        Property JogFW As Byte
         <DescriptionAttribute("点动反转控制，True表示反转")> _
-        Property JogBW As Boolean
+        Property JogBW As Byte
         <DescriptionAttribute("点动模式转速设定")> _
         Property JogVelocitySet As Double
         <DescriptionAttribute("速度模式的速度")> _
         Property VelocitySet As Double
         <DescriptionAttribute("速度模式，正反转取决于VelocitySet的正负")> _
-        Property VelocityMove As Boolean
+        Property VelocityMove As Byte
         <DescriptionAttribute("启动转矩限幅,在SCOUT中要先将p2175/2177设置为0")> _
-        Property EnableTorqueLimit As Boolean
+        Property EnableTorqueLimit As Byte
         <DescriptionAttribute("设定的转矩值")> _
         Property TorqueLimitValue As Double
     End Structure
@@ -362,10 +548,17 @@ Namespace SIMOTION
     Public Enum AXISOPERATEMODE
         ALMOFF = 0 'ALM没有供电
         IDLE    '空闲，ALM供电，EnableAxis is False，TorqueLimitValue is 0, EnableTorqueLimit is true
-        VELOCITYMODE    '速度控制模式, EnableAxis is True, VelocityMove is True
-        TORQUEMODE  '转矩控制模式
+        RUNNING 'VelocityMove = True
         [ERROR]     '故障
     End Enum
-    'End of AXXISOPERATEMODE
+    'End of AXISOPERATEMODE
+
+    Class Frame
+        Public Const Head_Control As Byte = &H68
+        'Public Const Head_Speed_Set As Byte = &H81
+        'Public Const Head_Torque_Set As Byte = &H82
+        Public Shared Frame_Enable_ALM() As Byte = New Byte(1) {&H67, &H1}
+        Public Shared Frame_Disable_ALM() As Byte = New Byte(1) {&H67, &H0}
+    End Class
 
 End Namespace
