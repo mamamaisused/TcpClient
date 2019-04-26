@@ -17,11 +17,11 @@ Public Class newClient
         PropertyGrid1.SelectedObject = Simotion
     End Sub
 
-    Private Sub btnTcpSend_Click(sender As Object, e As EventArgs) Handles btnTcpSend.Click
+    Private Sub btnTcpSend_Click(sender As Object, e As EventArgs)
         Simotion.SetAxisCommand(Simotion.Axis_Master.g_Axis_CMD)
     End Sub
 
-    Private Sub btnTest_Click(sender As Object, e As EventArgs) Handles btnTest.Click
+    Private Sub btnTest_Click(sender As Object, e As EventArgs)
 
         Dim cmd1 As sCMD
 
@@ -32,7 +32,7 @@ Public Class newClient
         Simotion.SetAxisCommand(cmd1, Simotion.Axis_Master.g_Axis_CMD)
     End Sub
 
-    Private Sub btnModify_Click(sender As Object, e As EventArgs) Handles btnModify.Click
+    Private Sub btnModify_Click(sender As Object, e As EventArgs)
         PropertyGrid1.SelectedObject = Simotion
     End Sub
 
@@ -51,10 +51,20 @@ Public Class newClient
     End Sub
 
     Private Sub btnStart_Click(sender As Object, e As EventArgs) Handles btnStart.Click
-        Simotion.SwitchAxisMode(Simotion.Axis_Master, AXISOPERATEMODE.RUNNING, txtVelocity.Text, txtTorque.Text)
+        If cboxMotor.Text = "Master" Then
+            Simotion.SwitchAxisMode(Simotion.Axis_Master, AXISOPERATEMODE.RUNNING, txtVelocity.Text, txtTorque.Text)
+        End If
+        If cboxMotor.Text = "Load" Then
+            Simotion.SwitchAxisMode(Simotion.Axis_Load, AXISOPERATEMODE.RUNNING, txtVelocity.Text, txtTorque.Text)
+        End If
     End Sub
 
     Private Sub btnStop_Click(sender As Object, e As EventArgs) Handles btnStop.Click
-        Simotion.SwitchAxisMode(Simotion.Axis_Master, AXISOPERATEMODE.IDLE)
+        If cboxMotor.Text = "Master" Then
+            Simotion.SwitchAxisMode(Simotion.Axis_Master, AXISOPERATEMODE.IDLE)
+        End If
+        If cboxMotor.Text = "Load" Then
+            Simotion.SwitchAxisMode(Simotion.Axis_Load, AXISOPERATEMODE.IDLE)
+        End If
     End Sub
 End Class

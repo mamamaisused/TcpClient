@@ -26,8 +26,6 @@ Partial Class newClient
         Me.PropertyGrid1 = New System.Windows.Forms.PropertyGrid()
         Me.btnConnect = New System.Windows.Forms.Button()
         Me.btnDisconnect = New System.Windows.Forms.Button()
-        Me.btnTcpSend = New System.Windows.Forms.Button()
-        Me.btnTest = New System.Windows.Forms.Button()
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.Label1 = New System.Windows.Forms.Label()
@@ -37,9 +35,9 @@ Partial Class newClient
         Me.btnStart = New System.Windows.Forms.Button()
         Me.btnDisableALM = New System.Windows.Forms.Button()
         Me.btnEnableALM = New System.Windows.Forms.Button()
-        Me.btnModify = New System.Windows.Forms.Button()
         Me.Panel2 = New System.Windows.Forms.Panel()
         Me.tmUdpReader = New System.Windows.Forms.Timer(Me.components)
+        Me.cboxMotor = New System.Windows.Forms.ComboBox()
         Me.Panel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
         Me.SuspendLayout()
@@ -49,7 +47,7 @@ Partial Class newClient
         Me.PropertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.PropertyGrid1.Location = New System.Drawing.Point(0, 0)
         Me.PropertyGrid1.Name = "PropertyGrid1"
-        Me.PropertyGrid1.Size = New System.Drawing.Size(1021, 514)
+        Me.PropertyGrid1.Size = New System.Drawing.Size(1021, 511)
         Me.PropertyGrid1.TabIndex = 0
         '
         'btnConnect
@@ -70,26 +68,9 @@ Partial Class newClient
         Me.btnDisconnect.Text = "断开"
         Me.btnDisconnect.UseVisualStyleBackColor = True
         '
-        'btnTcpSend
-        '
-        Me.btnTcpSend.Location = New System.Drawing.Point(851, 11)
-        Me.btnTcpSend.Name = "btnTcpSend"
-        Me.btnTcpSend.Size = New System.Drawing.Size(76, 41)
-        Me.btnTcpSend.TabIndex = 3
-        Me.btnTcpSend.Text = "发送"
-        Me.btnTcpSend.UseVisualStyleBackColor = True
-        '
-        'btnTest
-        '
-        Me.btnTest.Location = New System.Drawing.Point(769, 11)
-        Me.btnTest.Name = "btnTest"
-        Me.btnTest.Size = New System.Drawing.Size(76, 41)
-        Me.btnTest.TabIndex = 4
-        Me.btnTest.Text = "测试"
-        Me.btnTest.UseVisualStyleBackColor = True
-        '
         'Panel1
         '
+        Me.Panel1.Controls.Add(Me.cboxMotor)
         Me.Panel1.Controls.Add(Me.Label2)
         Me.Panel1.Controls.Add(Me.Label1)
         Me.Panel1.Controls.Add(Me.txtTorque)
@@ -98,15 +79,12 @@ Partial Class newClient
         Me.Panel1.Controls.Add(Me.btnStart)
         Me.Panel1.Controls.Add(Me.btnDisableALM)
         Me.Panel1.Controls.Add(Me.btnEnableALM)
-        Me.Panel1.Controls.Add(Me.btnModify)
-        Me.Panel1.Controls.Add(Me.btnTest)
-        Me.Panel1.Controls.Add(Me.btnTcpSend)
         Me.Panel1.Controls.Add(Me.btnConnect)
         Me.Panel1.Controls.Add(Me.btnDisconnect)
         Me.Panel1.Dock = System.Windows.Forms.DockStyle.Top
         Me.Panel1.Location = New System.Drawing.Point(0, 0)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(1021, 62)
+        Me.Panel1.Size = New System.Drawing.Size(1021, 65)
         Me.Panel1.TabIndex = 6
         '
         'Label2
@@ -181,28 +159,29 @@ Partial Class newClient
         Me.btnEnableALM.Text = "上电"
         Me.btnEnableALM.UseVisualStyleBackColor = True
         '
-        'btnModify
-        '
-        Me.btnModify.Location = New System.Drawing.Point(933, 11)
-        Me.btnModify.Name = "btnModify"
-        Me.btnModify.Size = New System.Drawing.Size(76, 41)
-        Me.btnModify.TabIndex = 5
-        Me.btnModify.Text = "刷新"
-        Me.btnModify.UseVisualStyleBackColor = True
-        '
         'Panel2
         '
         Me.Panel2.Controls.Add(Me.PropertyGrid1)
         Me.Panel2.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.Panel2.Location = New System.Drawing.Point(0, 62)
+        Me.Panel2.Location = New System.Drawing.Point(0, 65)
         Me.Panel2.Name = "Panel2"
-        Me.Panel2.Size = New System.Drawing.Size(1021, 514)
+        Me.Panel2.Size = New System.Drawing.Size(1021, 511)
         Me.Panel2.TabIndex = 7
         '
         'tmUdpReader
         '
         Me.tmUdpReader.Enabled = True
         Me.tmUdpReader.Interval = 200
+        '
+        'cboxMotor
+        '
+        Me.cboxMotor.FormattingEnabled = True
+        Me.cboxMotor.Items.AddRange(New Object() {"Master", "Load"})
+        Me.cboxMotor.Location = New System.Drawing.Point(766, 19)
+        Me.cboxMotor.Name = "cboxMotor"
+        Me.cboxMotor.Size = New System.Drawing.Size(106, 26)
+        Me.cboxMotor.TabIndex = 12
+        Me.cboxMotor.Text = "Master"
         '
         'newClient
         '
@@ -222,11 +201,8 @@ Partial Class newClient
     Friend WithEvents PropertyGrid1 As System.Windows.Forms.PropertyGrid
     Private WithEvents btnConnect As System.Windows.Forms.Button
     Private WithEvents btnDisconnect As System.Windows.Forms.Button
-    Private WithEvents btnTcpSend As System.Windows.Forms.Button
-    Private WithEvents btnTest As System.Windows.Forms.Button
     Friend WithEvents Panel1 As System.Windows.Forms.Panel
     Friend WithEvents Panel2 As System.Windows.Forms.Panel
-    Private WithEvents btnModify As System.Windows.Forms.Button
     Friend WithEvents tmUdpReader As System.Windows.Forms.Timer
     Private WithEvents btnDisableALM As System.Windows.Forms.Button
     Private WithEvents btnEnableALM As System.Windows.Forms.Button
@@ -236,4 +212,5 @@ Partial Class newClient
     Friend WithEvents txtVelocity As System.Windows.Forms.TextBox
     Private WithEvents btnStop As System.Windows.Forms.Button
     Private WithEvents btnStart As System.Windows.Forms.Button
+    Friend WithEvents cboxMotor As System.Windows.Forms.ComboBox
 End Class
