@@ -50,6 +50,7 @@ Partial Class fmTcpClient
         Me.Label7 = New System.Windows.Forms.Label()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.pnMotorControl = New System.Windows.Forms.Panel()
+        Me.PropertyGrid2 = New System.Windows.Forms.PropertyGrid()
         Me.btnBackward = New System.Windows.Forms.Button()
         Me.btnStop = New System.Windows.Forms.Button()
         Me.btnForward = New System.Windows.Forms.Button()
@@ -60,7 +61,6 @@ Partial Class fmTcpClient
         Me.btnEnableALM = New System.Windows.Forms.Button()
         Me.timer_udpReader = New System.Windows.Forms.Timer(Me.components)
         Me.PropertyGrid1 = New System.Windows.Forms.PropertyGrid()
-        Me.PropertyGrid2 = New System.Windows.Forms.PropertyGrid()
         Me.StatusStrip1.SuspendLayout()
         Me.pnMotorForm.SuspendLayout()
         Me.pnMotorControl.SuspendLayout()
@@ -84,7 +84,7 @@ Partial Class fmTcpClient
         Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabel1, Me.tslbStatus, Me.ToolStripStatusLabel2, Me.tslbALMState})
         Me.StatusStrip1.Location = New System.Drawing.Point(0, 655)
         Me.StatusStrip1.Name = "StatusStrip1"
-        Me.StatusStrip1.Size = New System.Drawing.Size(1051, 30)
+        Me.StatusStrip1.Size = New System.Drawing.Size(1067, 30)
         Me.StatusStrip1.TabIndex = 1
         Me.StatusStrip1.Text = "statusbar"
         '
@@ -209,7 +209,7 @@ Partial Class fmTcpClient
         Me.pnMotorForm.Controls.Add(Me.pnMotorControl)
         Me.pnMotorForm.Controls.Add(Me.btnEnableALM)
         Me.pnMotorForm.Dock = System.Windows.Forms.DockStyle.Right
-        Me.pnMotorForm.Location = New System.Drawing.Point(456, 0)
+        Me.pnMotorForm.Location = New System.Drawing.Point(472, 0)
         Me.pnMotorForm.Name = "pnMotorForm"
         Me.pnMotorForm.Size = New System.Drawing.Size(595, 655)
         Me.pnMotorForm.TabIndex = 8
@@ -306,6 +306,14 @@ Partial Class fmTcpClient
         Me.pnMotorControl.Size = New System.Drawing.Size(425, 655)
         Me.pnMotorControl.TabIndex = 2
         '
+        'PropertyGrid2
+        '
+        Me.PropertyGrid2.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.PropertyGrid2.Location = New System.Drawing.Point(0, 348)
+        Me.PropertyGrid2.Name = "PropertyGrid2"
+        Me.PropertyGrid2.Size = New System.Drawing.Size(425, 307)
+        Me.PropertyGrid2.TabIndex = 4
+        '
         'btnBackward
         '
         Me.btnBackward.Location = New System.Drawing.Point(144, 190)
@@ -390,22 +398,14 @@ Partial Class fmTcpClient
         Me.PropertyGrid1.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.PropertyGrid1.Location = New System.Drawing.Point(0, 348)
         Me.PropertyGrid1.Name = "PropertyGrid1"
-        Me.PropertyGrid1.Size = New System.Drawing.Size(456, 307)
+        Me.PropertyGrid1.Size = New System.Drawing.Size(472, 307)
         Me.PropertyGrid1.TabIndex = 4
-        '
-        'PropertyGrid2
-        '
-        Me.PropertyGrid2.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.PropertyGrid2.Location = New System.Drawing.Point(0, 348)
-        Me.PropertyGrid2.Name = "PropertyGrid2"
-        Me.PropertyGrid2.Size = New System.Drawing.Size(425, 307)
-        Me.PropertyGrid2.TabIndex = 4
         '
         'fmTcpClient
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 18.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1051, 685)
+        Me.ClientSize = New System.Drawing.Size(1067, 685)
         Me.Controls.Add(Me.PropertyGrid1)
         Me.Controls.Add(Me.pnMotorForm)
         Me.Controls.Add(Me.btnDisconnect)

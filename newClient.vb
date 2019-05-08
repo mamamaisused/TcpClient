@@ -67,4 +67,9 @@ Public Class newClient
             Simotion.SwitchAxisMode(Simotion.Axis_Load, AXISOPERATEMODE.IDLE)
         End If
     End Sub
+
+   
+    Private Sub btnReset_Click(sender As Object, e As EventArgs) Handles btnReset.Click
+        Simotion.ResetSystem()
+    End Sub
 End Class

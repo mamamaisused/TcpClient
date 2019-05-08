@@ -96,6 +96,11 @@ TCP
 	<param name="refReadBuffer">存入的缓存</param>
 	<returns>读取成功返回true否则false</returns>
 	<remarks></remarks>
+</member><member name="M:TCP.SIMOTION.SimotionSystem.ResetSystem">
+	<summary>
+ 重置系统，清除故障
+ </summary>
+	<remarks></remarks>
 </member><member name="M:TCP.SIMOTION.SimotionSystem.EnableALM">
 	<summary>
  使能ALM电源

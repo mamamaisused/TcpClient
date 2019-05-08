@@ -27,6 +27,8 @@ Partial Class newClient
         Me.btnConnect = New System.Windows.Forms.Button()
         Me.btnDisconnect = New System.Windows.Forms.Button()
         Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.btnReset = New System.Windows.Forms.Button()
+        Me.cboxMotor = New System.Windows.Forms.ComboBox()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.txtTorque = New System.Windows.Forms.TextBox()
@@ -37,7 +39,6 @@ Partial Class newClient
         Me.btnEnableALM = New System.Windows.Forms.Button()
         Me.Panel2 = New System.Windows.Forms.Panel()
         Me.tmUdpReader = New System.Windows.Forms.Timer(Me.components)
-        Me.cboxMotor = New System.Windows.Forms.ComboBox()
         Me.Panel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
         Me.SuspendLayout()
@@ -70,6 +71,7 @@ Partial Class newClient
         '
         'Panel1
         '
+        Me.Panel1.Controls.Add(Me.btnReset)
         Me.Panel1.Controls.Add(Me.cboxMotor)
         Me.Panel1.Controls.Add(Me.Label2)
         Me.Panel1.Controls.Add(Me.Label1)
@@ -86,6 +88,25 @@ Partial Class newClient
         Me.Panel1.Name = "Panel1"
         Me.Panel1.Size = New System.Drawing.Size(1021, 65)
         Me.Panel1.TabIndex = 6
+        '
+        'btnReset
+        '
+        Me.btnReset.Location = New System.Drawing.Point(933, 12)
+        Me.btnReset.Name = "btnReset"
+        Me.btnReset.Size = New System.Drawing.Size(76, 41)
+        Me.btnReset.TabIndex = 13
+        Me.btnReset.Text = "复位"
+        Me.btnReset.UseVisualStyleBackColor = True
+        '
+        'cboxMotor
+        '
+        Me.cboxMotor.FormattingEnabled = True
+        Me.cboxMotor.Items.AddRange(New Object() {"Master", "Load"})
+        Me.cboxMotor.Location = New System.Drawing.Point(766, 19)
+        Me.cboxMotor.Name = "cboxMotor"
+        Me.cboxMotor.Size = New System.Drawing.Size(106, 26)
+        Me.cboxMotor.TabIndex = 12
+        Me.cboxMotor.Text = "Master"
         '
         'Label2
         '
@@ -173,16 +194,6 @@ Partial Class newClient
         Me.tmUdpReader.Enabled = True
         Me.tmUdpReader.Interval = 200
         '
-        'cboxMotor
-        '
-        Me.cboxMotor.FormattingEnabled = True
-        Me.cboxMotor.Items.AddRange(New Object() {"Master", "Load"})
-        Me.cboxMotor.Location = New System.Drawing.Point(766, 19)
-        Me.cboxMotor.Name = "cboxMotor"
-        Me.cboxMotor.Size = New System.Drawing.Size(106, 26)
-        Me.cboxMotor.TabIndex = 12
-        Me.cboxMotor.Text = "Master"
-        '
         'newClient
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 18.0!)
@@ -213,4 +224,5 @@ Partial Class newClient
     Private WithEvents btnStop As System.Windows.Forms.Button
     Private WithEvents btnStart As System.Windows.Forms.Button
     Friend WithEvents cboxMotor As System.Windows.Forms.ComboBox
+    Private WithEvents btnReset As System.Windows.Forms.Button
 End Class

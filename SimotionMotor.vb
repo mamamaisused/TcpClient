@@ -239,6 +239,14 @@ Namespace SIMOTION
         Public Property Axis_Load As New SimotionMotor("Axis_Load", valIndex:=2)
 
         ''' <summary>
+        ''' 重置系统，清除故障
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Sub ResetSystem()
+            TcpSend(Frame.Frame_Reset)
+        End Sub
+
+        ''' <summary>
         ''' 使能ALM电源
         ''' </summary>
         ''' <remarks>在控制电机前必须启动电机电源</remarks>
@@ -555,6 +563,7 @@ Namespace SIMOTION
 
     Class Frame
         Public Const Head_Control As Byte = &H68
+        Public Shared Frame_Reset() As Byte = New Byte(0) {&H66}
         'Public Const Head_Speed_Set As Byte = &H81
         'Public Const Head_Torque_Set As Byte = &H82
         Public Shared Frame_Enable_ALM() As Byte = New Byte(1) {&H67, &H1}
